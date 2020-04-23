@@ -16,3 +16,5 @@ The generated data will then be migrated into a SQL file, which can be imported 
 It can be found in the configured data directory `readmecorp.dataDir`, default is [userhome]/readmecorp.
 
 When the database import is done, open the client interface at: [http://localhost](http://localhost)
+
+![Screenshot](screenshot.png)
