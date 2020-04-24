@@ -13,12 +13,15 @@ public class AppConfig
 
 	@Value("${readmecorp.initialDataAmount:medium}")
 	private String initialDataAmountConfiguration;
-	
+
+	@Value("${readmecorp.jpaDataMigrationStrategy:batch_insert}")
+	private String jpaDataMigrationStrategy;
+
 	public AppConfig()
 	{
 		super();
 	}
-	
+
 	public String dataDir()
 	{
 		final String dir = this.dataDir;
@@ -26,9 +29,15 @@ public class AppConfig
 			? Paths.get(System.getProperty("user.home"), dir.substring(2)).toString()
 			: dir;
 	}
-	
+
 	public RandomDataAmount initialDataAmount()
 	{
 		return RandomDataAmount.valueOf(this.initialDataAmountConfiguration);
 	}
+
+	public String jpaDataMigrationStrategy()
+	{
+		return this.jpaDataMigrationStrategy;
+	}
+
 }

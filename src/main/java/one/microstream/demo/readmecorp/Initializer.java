@@ -16,7 +16,7 @@ public class Initializer implements HasLogger
 {
 	private final ReadMeCorp   readMeCorp;
 	private final Repositories repositories;
-	
+
 	@Autowired
 	public Initializer(
 		final ReadMeCorp readMeCorp,
@@ -27,22 +27,59 @@ public class Initializer implements HasLogger
 		this.readMeCorp   = readMeCorp;
 		this.repositories = repositories;
 	}
-	
+
 	@PostConstruct
 	public void init()
 	{
 		this.readMeCorp.data();
-		
+
 		if(this.repositories.bookRepository().count() == 0)
 		{
-			this.logger().info("JPA database is empty, migrating data from MicroStream");
-			
-			DataMigrator.FromMicroStream(
-				this.readMeCorp,
-				this.repositories)
-			.migrate();
-			
-			this.logger().info("Migration finished");
+			this.migrateData();
 		}
 	}
+
+	private void migrateData()
+	{
+		DataMigrator dataMigrator             = null;
+		final String jpaDataMigrationStrategy = this.readMeCorp.getAppConfig().jpaDataMigrationStrategy();
+		switch(jpaDataMigrationStrategy)
+		{
+			case "batch_insert":
+
+				dataMigrator = DataMigrator.BatchInsert(
+					this.readMeCorp,
+					this.repositories
+				);
+
+				break;
+
+			case "sql_file":
+
+				dataMigrator = DataMigrator.SqlFile(
+					this.readMeCorp,
+					this.repositories
+				);
+
+				break;
+		}
+
+		if(dataMigrator == null)
+		{
+			throw new IllegalArgumentException(
+				"Invalid data migration strategy: " + jpaDataMigrationStrategy
+				+ ", valid options are batch_insert or sql_file"
+			);
+		}
+
+		this.logger().info(
+			"JPA database is empty, migrating data from MicroStream, strategy = "
+			+ jpaDataMigrationStrategy
+		);
+
+		dataMigrator.migrate();
+
+		this.logger().info("Migration finished");
+	}
+
 }
