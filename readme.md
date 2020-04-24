@@ -21,10 +21,10 @@ It is a Spring Boot application with a Vaadin frontend. Per default Postgres is 
   Please note, that this is by far the faster way, but the generated inserts are optimized for Postgres and probably won't work with a different database.
   
 Here you can see the entity relationship diagram of the generated database:
-![ERD](readme-assets/erd.png)
+![ERD](docs/images/erd.png?raw=true)
 
 ## Usage
 
 After the application has started, open the client interface at: [http://localhost](http://localhost).
 
-![Screenshot](readme-assets/screenshot.png)
+![Screenshot](docs/images/screenshot.png?raw=true)
