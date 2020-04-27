@@ -13,6 +13,8 @@
 	<artifactId>bookstore-demo-performance</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
+	<name>MicroStream BookStore Performance Demo</name>
+
 	<organization>
 		<name>Microstream Software</name>
 		<url>http://microstream.one</url>
@@ -32,7 +34,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<rap.version>10.02.00-RAP-SNAPSHOT</rap.version>
-		<microstream.version>03.01.00-MS-GA-SNAPSHOT</microstream.version>
+		<microstream.version>03.00.00-MS-GA</microstream.version>
 		<lucene.version>8.4.1</lucene.version>
 	</properties>
 
