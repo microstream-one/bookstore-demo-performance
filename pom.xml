@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>one.microstream</groupId>
-	<artifactId>demo.readmecorp.performance</artifactId>
+	<artifactId>bookstore-demo-performance</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
 	<organization>
@@ -32,7 +32,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<rap.version>10.02.00-RAP-SNAPSHOT</rap.version>
-		<microstream.version>03.00.00-MS-GA</microstream.version>
+		<microstream.version>03.01.00-MS-GA-SNAPSHOT</microstream.version>
 		<lucene.version>8.4.1</lucene.version>
 	</properties>
 
@@ -157,7 +157,7 @@
 				<configuration>
 					<wait>500</wait>
 					<maxAttempts>240</maxAttempts>
-					<mainClass>one.microstream.demo.readmecorp.Application</mainClass>
+					<mainClass>one.microstream.demo.bookstore.Application</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -185,7 +185,7 @@
 						<artifactId>spring-boot-maven-plugin</artifactId>
 						<configuration>
 							<jvmArguments>-Dvaadin.productionMode</jvmArguments>
-							<mainClass>one.microstream.demo.readmecorp.Application</mainClass>
+							<mainClass>one.microstream.demo.bookstore.Application</mainClass>
 						</configuration>
 					</plugin>
 				</plugins>
