@@ -1,7 +1,7 @@
 
 # MicroStream BookStore Performance Demo
 
-![ERD](docs/images/bookstoredemo.svg?raw=true)
+![BookStore Demo](docs/images/bookstoredemo.svg?raw=true)
 
 With this demo the superior performance of MicroStream and the Java VM compared to JPA with a connected database is visualized.
 It is a Spring Boot application with a Vaadin frontend. Per default Postgres is used, but you can change the application's setup, to use any other database.
