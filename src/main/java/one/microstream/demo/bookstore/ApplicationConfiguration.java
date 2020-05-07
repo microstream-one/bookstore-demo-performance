@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import one.microstream.demo.bookstore.dal.DataAccess;
 import one.microstream.demo.bookstore.jpa.dal.AddressRepository;
 import one.microstream.demo.bookstore.jpa.dal.AuthorRepository;
 import one.microstream.demo.bookstore.jpa.dal.BookRepository;
@@ -28,26 +27,18 @@ import one.microstream.demo.bookstore.jpa.dal.StateRepository;
 
 @Configuration
 @ComponentScan(basePackageClasses = Repositories.class)
-public class Config
+public class ApplicationConfiguration
 {
 	@Bean
-	public AppConfig getAppConfig()
+	public DemoConfiguration getDemoConfiguration()
 	{
-		return new AppConfig();
+		return new DemoConfiguration();
 	}
 
 	@Bean(destroyMethod = "shutdown")
-	public BookStoreDemo getBookStoreDemo(final AppConfig appConfig)
+	public BookStoreDemo getBookStoreDemo(final DemoConfiguration demoConfiguration)
 	{
-		return new BookStoreDemo(appConfig);
-	}
-
-	@Bean
-	public DataAccess getDataAccess(
-		final BookStoreDemo bookStoreDemo
-	)
-	{
-		return DataAccess.New(bookStoreDemo);
+		return new BookStoreDemo(demoConfiguration);
 	}
 
 	@Bean

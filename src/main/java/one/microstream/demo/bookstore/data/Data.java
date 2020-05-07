@@ -1,76 +1,112 @@
 
 package one.microstream.demo.bookstore.data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
+import one.microstream.demo.bookstore.BookStoreDemo;
 import one.microstream.storage.types.EmbeddedStorageManager;
 
-
+/**
+ * Root object for all data used by this application.
+ * <p>
+ * This is the entry point for the persisted object graph.
+ * <p>
+ * The data is divided into four sections:
+ * <ul>
+ * <li>{@link Books}</li>
+ * <li>{@link Shops}</li>
+ * <li>{@link Customers}</li>
+ * <li>{@link Purchases}</li>
+ * </ul>
+ *
+ * @see <a href="https://manual.docs.microstream.one/data-store/root-instances">MicroStream Reference Manual</a>
+ */
 public interface Data
 {
+	/**
+	 * Get the {@link Books} instance of this data node.
+	 * @return the {@link Books}
+	 */
 	public Books books();
-	
-	public Stream<Shop> shops();
-	
-	public Stream<Customer> customers();
-		
+
+	/**
+	 * Get the {@link Shops} instance of this data node.
+	 * @return the {@link Shops}
+	 */
+	public Shops shops();
+
+	/**
+	 * Get the {@link Customers} instance of this data node.
+	 * @return the {@link Customers}
+	 */
+	public Customers customers();
+
+	/**
+	 * Get the {@link Purchases} instance of this data node.
+	 * @return the {@link Purchases}
+	 */
 	public Purchases purchases();
-	
-	public DataMetrics populate(
-		final RandomDataAmount initialDataSize,
-		final EmbeddedStorageManager storageManager
-	);
-	
-	public static Data New()
+
+
+	/**
+	 * Pseudo-constructor method to create a new {@link Data} instance with default implementation.
+	 *
+	 * @return a new {@link Data} instance.
+	 */
+	public static Data.Default New()
 	{
 		return new Default();
 	}
-	
+
+
+	/**
+	 * Default implementation of the {@link Data} interface.
+	 */
 	public static class Default implements Data
 	{
-		private final Books.Mutable     books     = new Books.Default();
-		private final List<Shop>        shops     = new ArrayList<>(1024);
-		private final List<Customer>    customers = new ArrayList<>(16384);
-		private final Purchases.Mutable purchases = new Purchases.Default();
-		
+		private final Books.Default     books     = new Books.Default();
+		private final Shops.Default     shops     = new Shops.Default();
+		private final Customers.Default customers = new Customers.Default();
+		private final Purchases.Default purchases = new Purchases.Default();
+
 		Default()
 		{
 			super();
 		}
-		
+
 		@Override
 		public Books books()
 		{
 			return this.books;
 		}
-		
+
 		@Override
-		public Stream<Shop> shops()
+		public Shops shops()
 		{
-			return this.shops.stream();
+			return this.shops;
 		}
-		
+
 		@Override
-		public Stream<Customer> customers()
+		public Customers customers()
 		{
-			return this.customers.stream();
+			return this.customers;
 		}
-				
+
 		@Override
 		public Purchases purchases()
 		{
 			return this.purchases;
 		}
-		
-		@Override
+
+
+		/**
+		 * This method is used exclusively by the {@link BookStoreDemo}
+		 * and it's not published by the {@link Data} interface.
+		 */
 		public DataMetrics populate(
 			final RandomDataAmount initialDataSize,
 			final EmbeddedStorageManager storageManager
 		)
 		{
-			final DataMetrics metrics = new RandomDataGenerator(
+			return RandomDataGenerator.New(
 				this.books,
 				this.shops,
 				this.customers,
@@ -79,12 +115,8 @@ public interface Data
 				storageManager
 			)
 			.generate();
-			
-			System.gc();
-			
-			return metrics;
 		}
-		
+
 	}
-	
+
 }

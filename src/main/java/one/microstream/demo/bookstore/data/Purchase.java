@@ -1,21 +1,64 @@
 
 package one.microstream.demo.bookstore.data;
 
-import java.util.Arrays;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.money.MonetaryAmount;
 
-public interface Purchase extends Entity
+/**
+ * Purchase entity which holds a {@link Shop}, {@link Employee},
+ * {@link Customer}, timestamp and {@link Item}s.
+ * <p>
+ * This type is immutable and therefor inherently thread safe.
+ *
+ */
+public interface Purchase
 {
-	public static interface Item extends Entity
+	/**
+	 * Purchase item entity, which holds a {@link Book}, an amount and a price.
+	 *
+	 */
+	public static interface Item
 	{
+		/**
+		 * Get the book
+		 *
+		 * @return the book
+		 */
 		public Book book();
-		
+
+		/**
+		 * Get the amount of books
+		 *
+		 * @return the amount
+		 */
 		public int amount();
-		
-		public double itemTotal();
-		
+
+		/**
+		 * Get the price the book was sold for
+		 *
+		 * @return the price at the time the book was sold
+		 */
+		public MonetaryAmount price();
+
+		/**
+		 * Computes the total amount of the purchase item (price * amound)
+		 *
+		 * @return the total amount of this item
+		 */
+		public MonetaryAmount itemTotal();
+
+
+		/**
+		 * Pseudo-constructor method to create a new {@link Item} instance with default implementation.
+		 *
+		 * @param book not <code>null</code>
+		 * @param amount positive amount
+		 * @return the new {@link Item} instance
+		 */
 		public static Item New(
 			final Book book,
 			final int amount
@@ -23,12 +66,18 @@ public interface Purchase extends Entity
 		{
 			return new Default(book, amount);
 		}
-		
+
+
+		/**
+		 * Default implementation of the {@link Item} interface.
+		 *
+		 */
 		public static class Default implements Item
 		{
-			private final Book book;
-			private final int  amount;
-			
+			private final Book           book;
+			private final int            amount;
+			private final MonetaryAmount price;
+
 			Default(
 				final Book book,
 				final int amount
@@ -37,70 +86,123 @@ public interface Purchase extends Entity
 				super();
 				this.book   = book;
 				this.amount = amount;
+				this.price  = book.retailPrice();
 			}
-			
+
 			@Override
 			public Book book()
 			{
 				return this.book;
 			}
-			
+
 			@Override
 			public int amount()
 			{
 				return this.amount;
 			}
-			
+
 			@Override
-			public double itemTotal()
+			public MonetaryAmount price()
 			{
-				return this.amount * this.book.price();
+				return this.price;
 			}
-			
+
+			@Override
+			public MonetaryAmount itemTotal()
+			{
+				return this.price.multiply(this.amount);
+			}
+
 		}
-		
+
 	}
-	
+
+	/**
+	 * Get the shop the purchase was made in
+	 *
+	 * @return the shop
+	 */
 	public Shop shop();
-	
+
+	/**
+	 * Get the employee who sold
+	 *
+	 * @return the employee
+	 */
 	public Employee employee();
-	
+
+	/**
+	 * Get the customer who made the purchase
+	 *
+	 * @return the customer
+	 */
 	public Customer customer();
-	
-	public long timestamp();
-	
+
+	/**
+	 * The timestamp the purchase was made at
+	 *
+	 * @return the timestamp
+	 */
+	public LocalDateTime timestamp();
+
+	/**
+	 * Get all {@link Item}s of this purchase
+	 *
+	 * @return a {@link Stream} of {@link Item}s
+	 */
 	public Stream<Item> items();
-	
+
 	public int itemCount();
-	
-	public double total();
-	
+
+	/**
+	 * Computes the total of this purchase (sum of {@link Item#itemTotal()})
+	 *
+	 * @return the total amount
+	 */
+	public MonetaryAmount total();
+
+
+	/**
+	 * Pseudo-constructor method to create a new {@link Purchase} instance with default implementation.
+	 *
+	 * @param shop not <code>null</code>
+	 * @param employee not <code>null</code>
+	 * @param customer not <code>null</code>
+	 * @param timestamp not <code>null</code>
+	 * @param items not empty
+	 * @return a new {@link Purchase} instance
+	 */
 	public static Purchase New(
 		final Shop shop,
 		final Employee employee,
 		final Customer customer,
-		final long timestamp,
+		final LocalDateTime timestamp,
 		final List<Item> items
 	)
 	{
-		return new Default(shop, employee, customer, timestamp, items.toArray(new Item[items.size()]));
+		return new Default(shop, employee, customer, timestamp, items);
 	}
-	
+
+
+	/**
+	 * Default implementation of the {@link Purchase} interface.
+	 *
+	 */
 	public static class Default implements Purchase
 	{
-		private final Shop       shop;
-		private final Employee   employee;
-		private final Customer   customer;
-		private final long       timestamp;
-		private final Item[]     items;
-		private transient double total = -1.0;
-		
+		private final Shop               shop;
+		private final Employee           employee;
+		private final Customer           customer;
+		private final LocalDateTime      timestamp;
+		private final List<Item>         items;
+		private transient MonetaryAmount total;
+
 		Default(
 			final Shop shop,
 			final Employee employee,
 			final Customer customer,
-			final long timestamp,
-			final Item[] items
+			final LocalDateTime timestamp,
+			final List<Item> items
 		)
 		{
 			super();
@@ -108,60 +210,62 @@ public interface Purchase extends Entity
 			this.employee  = employee;
 			this.customer  = customer;
 			this.timestamp = timestamp;
-			this.items     = items;
+			this.items     = new ArrayList<>(items);
 		}
-		
+
 		@Override
 		public Shop shop()
 		{
 			return this.shop;
 		}
-		
+
 		@Override
 		public Employee employee()
 		{
 			return this.employee;
 		}
-		
+
 		@Override
 		public Customer customer()
 		{
 			return this.customer;
 		}
-		
+
 		@Override
-		public long timestamp()
+		public LocalDateTime timestamp()
 		{
 			return this.timestamp;
 		}
-		
+
 		@Override
 		public Stream<Item> items()
 		{
-			return Arrays.stream(this.items);
+			return this.items.stream();
 		}
-		
+
 		@Override
 		public int itemCount()
 		{
-			return this.items.length;
+			return this.items.size();
 		}
-		
+
 		@Override
-		public double total()
+		public MonetaryAmount total()
 		{
-			if(this.total <= 0.0)
+			if(this.total  == null)
 			{
-				double total = 0.0;
+				MonetaryAmount total = null;
 				for(final Item item : this.items)
 				{
-					total += item.itemTotal();
+					total = total == null
+						? item.itemTotal()
+						: total.add(item.itemTotal());
 				}
 				this.total = total;
 			}
 			return this.total;
 		}
-		
+
 	}
-	
+
 }

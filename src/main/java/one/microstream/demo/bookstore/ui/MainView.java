@@ -97,7 +97,6 @@ import one.microstream.demo.bookstore.app.ClearAction;
 import one.microstream.demo.bookstore.app.ExecutionCallback;
 import one.microstream.demo.bookstore.app.QueryAction;
 import one.microstream.demo.bookstore.app.QueryStats;
-import one.microstream.demo.bookstore.dal.DataAccess;
 import one.microstream.demo.bookstore.jpa.dal.Repositories;
 
 
@@ -232,13 +231,12 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 
 	public MainView(
 		final BookStoreDemo bookStoreDemo,
-		final DataAccess dataAccess,
 		final Repositories repositories
 	)
 	{
 		this.bookStoreDemo  = bookStoreDemo;
 		this.repositories   = repositories;
-		this.queries        = Query.All(dataAccess, repositories);
+		this.queries        = Query.All(bookStoreDemo.data(), repositories);
 		this.actionExecutor = ActionExecutor.New(this);
 
 		final VerticalLayout settingsLayout = new VerticalLayout(

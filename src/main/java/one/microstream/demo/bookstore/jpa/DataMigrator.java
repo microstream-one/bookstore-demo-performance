@@ -13,8 +13,6 @@ import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,11 +21,14 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.rapidpm.dependencies.core.logger.HasLogger;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+
+import com.google.common.collect.Range;
 
 import one.microstream.bytes.ByteMultiple;
 import one.microstream.demo.bookstore.BookStoreDemo;
@@ -169,7 +170,7 @@ public interface DataMigrator
 			private final Iterator<Entry<T, Long>> iterator;
 			private final int                      size;
 			private final BiConsumer<Object[], T>  valueSetter;
-			private final Object[]                       record;
+			private final Object[]                 record;
 
 			BatchDumper(
 				final EntityIdMap<T> entityIdMap,
@@ -248,7 +249,7 @@ public interface DataMigrator
 		{
 			final PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(
-						Paths.get(this.bookStoreDemo.getAppConfig().dataDir(), "bookstoredemo.sql").toFile()
+						Paths.get(this.bookStoreDemo.getDemoConfiguration().dataDir(), "bookstoredemo.sql").toFile()
 					),
 					"UTF-8"),
 				(int)ByteMultiple.MiB.toBytes(100) // buffer size
@@ -274,13 +275,13 @@ public interface DataMigrator
 			final Data data = this.bookStoreDemo.data();
 
 			final EntityIdMap<Address> addresses = concat(
-					data.books().authors().map(Author::address),
-					data.books().publishers().map(Publisher::address),
-					data.shops().flatMap(shop -> concat(
+					data.books().computeAuthors(authors -> authors.map(Author::address)),
+					data.books().computePublishers(publishers -> publishers.map(Publisher::address)),
+					data.shops().compute(shops -> shops.flatMap(shop -> concat(
 						Stream.of(shop.address()),
 						shop.employees().map(Employee::address)
-					)),
-					data.customers().map(Customer::address)
+					))),
+					data.customers().compute(customers -> customers.map(Customer::address))
 				)
 				.distinct()
 				.collect(toEntityIdMap());
@@ -342,7 +343,7 @@ public interface DataMigrator
 			this.logger().info("> customers");
 
 			final EntityIdMap<Customer> customers = this.bookStoreDemo.data().customers()
-				.collect(toEntityIdMap());
+				.compute(stream -> stream.collect(toEntityIdMap()));
 
 			this.dump(this.repositories.customerRepository(), new BatchDumper<>(customers, 3, (record, entity) ->
 			{
@@ -364,8 +365,7 @@ public interface DataMigrator
 			final Data data = this.bookStoreDemo.data();
 
 			final EntityIdMap<Genre> genres = data.books()
-				.genres()
-				.collect(toEntityIdMap());
+				.computeGenres(stream -> stream.collect(toEntityIdMap()));
 
 			this.dump(this.repositories.genreRepository(), new BatchDumper<>(genres, 2, (record, entity) ->
 			{
@@ -373,8 +373,7 @@ public interface DataMigrator
 			}));
 
 			final EntityIdMap<Author> authors = data.books()
-				.authors()
-				.collect(toEntityIdMap());
+				.computeAuthors(stream -> stream.collect(toEntityIdMap()));
 
 			this.dump(this.repositories.authorRepository(), new BatchDumper<>(authors, 3, (record, entity) ->
 			{
@@ -383,8 +382,7 @@ public interface DataMigrator
 			}));
 
 			final EntityIdMap<Publisher> publishers = data.books()
-				.publishers()
-				.collect(toEntityIdMap());
+				.computePublishers(stream -> stream.collect(toEntityIdMap()));
 
 			this.dump(this.repositories.publisherRepository(), new BatchDumper<>(publishers, 3, (record, entity) ->
 			{
@@ -393,8 +391,7 @@ public interface DataMigrator
 			}));
 
 			final EntityIdMap<Language> languages = data.books()
-				.languages()
-				.collect(toEntityIdMap());
+				.computeLanguages(stream -> stream.collect(toEntityIdMap()));
 
 			this.dump(this.repositories.languageRepository(), new BatchDumper<>(languages, 2, (record, entity) ->
 			{
@@ -402,18 +399,18 @@ public interface DataMigrator
 			}));
 
 			final EntityIdMap<Book> books = data.books()
-				.all()
-				.collect(toEntityIdMap());
+				.compute(stream -> stream.collect(toEntityIdMap()));
 
 			this.dump(this.repositories.bookRepository(), new BatchDumper<>(books, 8, (record, entity) ->
 			{
 				record[1] = entity.isbn13();
-				record[2] = entity.price();
-				record[3] = entity.title();
-				record[4] = authors.get(entity.author());
-				record[5] = genres.get(entity.genre());
-				record[6] = languages.get(entity.language());
-				record[7] = publishers.get(entity.publisher());
+				record[2] = entity.purchasePrice().getNumber().doubleValue();
+				record[3] = entity.retailPrice().getNumber().doubleValue();
+				record[4] = entity.title();
+				record[5] = authors.get(entity.author());
+				record[6] = genres.get(entity.genre());
+				record[7] = languages.get(entity.language());
+				record[8] = publishers.get(entity.publisher());
 			}));
 
 			authors.clear();
@@ -435,7 +432,7 @@ public interface DataMigrator
 			this.logger().info("> shops");
 
 			final EntityIdMap<Shop> shops = this.bookStoreDemo.data().shops()
-				.collect(toEntityIdMap());
+				.compute(stream -> stream.collect(toEntityIdMap()));
 
 			this.dump(this.repositories.shopRepository(), new BatchDumper<>(shops, 3, (record, entity) ->
 			{
@@ -462,11 +459,11 @@ public interface DataMigrator
 				.flatMap(shopEntry -> {
 					final Shop shop = shopEntry.getKey();
 					final Long sid  = shopEntry.getValue();
-					return shop.inventory().slots().map(slot -> {
+					return shop.inventory().compute(stream -> stream.map(slot -> {
 						final Book book = slot.getKey();
 						final int amount = slot.getValue();
 						return new InventoryItem(sid, books.get(book), amount);
-					});
+					}));
 				})
 				.collect(toEntityIdMap());
 
@@ -496,18 +493,21 @@ public interface DataMigrator
 			final AutoIncrement purchaseId     = new AutoIncrement();
 			final AutoIncrement purchaseItemId = new AutoIncrement();
 
-			data.purchases().years().forEach(year ->
+			final Range<Integer> years = data.purchases().years();
+			IntStream.rangeClosed(years.lowerEndpoint(), years.upperEndpoint()).forEach(year ->
 			{
 				this.logger().info("> purchases in " + year);
 
-				final EntityIdMap<Purchase> purchases = data.purchases().byYear(year)
-					.collect(toEntityIdMap(purchaseId));
+				final EntityIdMap<Purchase> purchases = data.purchases().computeByYear(
+					year,
+					stream -> stream.collect(toEntityIdMap(purchaseId))
+				);
 
 				this.dump(this.repositories.purchaseRepository(), new BatchDumper<>(purchases, 5, (record, entity) ->
 				{
 					record[1] = employees.get(entity.employee());
 					record[2] = customers.get(entity.customer());
-					record[3] = LocalDateTime.ofInstant(Instant.ofEpochMilli(entity.timestamp()), ZoneOffset.UTC);
+					record[3] = entity.timestamp();
 					record[4] = shops.get(entity.shop());
 				}));
 
@@ -524,6 +524,7 @@ public interface DataMigrator
 					record[1] = entity.foreignId;
 					record[2] = books.get(entity.item.book());
 					record[3] = entity.item.amount();
+					record[4] = entity.item.price().getNumber().doubleValue();
 				}));
 
 				this.logger().info("+ " + purchases.size() + " purchases in " + year);
@@ -630,13 +631,13 @@ public interface DataMigrator
 			final Data data = this.bookStoreDemo.data();
 
 			final EntityIdMap<Address> addresses = concat(
-					data.books().authors().map(Author::address),
-					data.books().publishers().map(Publisher::address),
-					data.shops().flatMap(shop -> concat(
+					data.books().computeAuthors(authors -> authors.map(Author::address)),
+					data.books().computePublishers(publishers -> publishers.map(Publisher::address)),
+					data.shops().compute(shops -> shops.flatMap(shop -> concat(
 						Stream.of(shop.address()),
 						shop.employees().map(Employee::address)
-					)),
-					data.customers().map(Customer::address)
+					))),
+					data.customers().compute(customers -> customers.map(Customer::address))
 				)
 				.distinct()
 				.collect(toEntityIdMap());
@@ -698,7 +699,7 @@ public interface DataMigrator
 			this.logger().info("> customers");
 
 			final EntityIdMap<Customer> customers = this.bookStoreDemo.data().customers()
-				.collect(toEntityIdMap());
+				.compute(stream -> stream.collect(toEntityIdMap()));
 
 			this.batchInsert(this.repositories.customerRepository(), new BatchInserter<>(customers, (ps, entity) ->
 			{
@@ -720,8 +721,7 @@ public interface DataMigrator
 			final Data data = this.bookStoreDemo.data();
 
 			final EntityIdMap<Genre> genres = data.books()
-				.genres()
-				.collect(toEntityIdMap());
+				.computeGenres(stream -> stream.collect(toEntityIdMap()));
 
 			this.batchInsert(this.repositories.genreRepository(), new BatchInserter<>(genres, (ps, entity) ->
 			{
@@ -729,8 +729,7 @@ public interface DataMigrator
 			}));
 
 			final EntityIdMap<Author> authors = data.books()
-				.authors()
-				.collect(toEntityIdMap());
+				.computeAuthors(stream -> stream.collect(toEntityIdMap()));
 
 			this.batchInsert(this.repositories.authorRepository(), new BatchInserter<>(authors, (ps, entity) ->
 			{
@@ -739,8 +738,7 @@ public interface DataMigrator
 			}));
 
 			final EntityIdMap<Publisher> publishers = data.books()
-				.publishers()
-				.collect(toEntityIdMap());
+				.computePublishers(stream -> stream.collect(toEntityIdMap()));
 
 			this.batchInsert(this.repositories.publisherRepository(), new BatchInserter<>(publishers, (ps, entity) ->
 			{
@@ -749,8 +747,7 @@ public interface DataMigrator
 			}));
 
 			final EntityIdMap<Language> languages = data.books()
-				.languages()
-				.collect(toEntityIdMap());
+				.computeLanguages(stream -> stream.collect(toEntityIdMap()));
 
 			this.batchInsert(this.repositories.languageRepository(), new BatchInserter<>(languages, (ps, entity) ->
 			{
@@ -758,18 +755,18 @@ public interface DataMigrator
 			}));
 
 			final EntityIdMap<Book> books = data.books()
-				.all()
-				.collect(toEntityIdMap());
+				.compute(stream -> stream.collect(toEntityIdMap()));
 
 			this.batchInsert(this.repositories.bookRepository(), new BatchInserter<>(books, (ps, entity) ->
 			{
 				ps.setString(2, entity.isbn13());
-				ps.setDouble(3, entity.price());
-				ps.setString(4, entity.title());
-				ps.setLong(5, authors.get(entity.author()));
-				ps.setLong(6, genres.get(entity.genre()));
-				ps.setLong(7, languages.get(entity.language()));
-				ps.setLong(8, publishers.get(entity.publisher()));
+				ps.setDouble(3, entity.purchasePrice().getNumber().doubleValue());
+				ps.setDouble(4, entity.retailPrice().getNumber().doubleValue());
+				ps.setString(5, entity.title());
+				ps.setLong(6, authors.get(entity.author()));
+				ps.setLong(7, genres.get(entity.genre()));
+				ps.setLong(8, languages.get(entity.language()));
+				ps.setLong(9, publishers.get(entity.publisher()));
 			}));
 
 			authors.clear();
@@ -791,7 +788,7 @@ public interface DataMigrator
 			this.logger().info("> shops");
 
 			final EntityIdMap<Shop> shops = this.bookStoreDemo.data().shops()
-				.collect(toEntityIdMap());
+				.compute(stream -> stream.collect(toEntityIdMap()));
 
 			this.batchInsert(this.repositories.shopRepository(), new BatchInserter<>(shops, (ps, entity) ->
 			{
@@ -818,11 +815,11 @@ public interface DataMigrator
 				.flatMap(shopEntry -> {
 					final Shop shop = shopEntry.getKey();
 					final Long sid  = shopEntry.getValue();
-					return shop.inventory().slots().map(slot -> {
+					return shop.inventory().compute(stream -> stream.map(slot -> {
 						final Book book = slot.getKey();
 						final int amount = slot.getValue();
 						return new InventoryItem(sid, books.get(book), amount);
-					});
+					}));
 				})
 				.collect(toEntityIdMap());
 
@@ -852,18 +849,21 @@ public interface DataMigrator
 			final AutoIncrement purchaseId     = new AutoIncrement();
 			final AutoIncrement purchaseItemId = new AutoIncrement();
 
-			data.purchases().years().forEach(year ->
+			final Range<Integer> years = data.purchases().years();
+			IntStream.rangeClosed(years.lowerEndpoint(), years.upperEndpoint()).forEach(year ->
 			{
 				this.logger().info("> purchases in " + year);
 
-				final EntityIdMap<Purchase> purchases = data.purchases().byYear(year)
-					.collect(toEntityIdMap(purchaseId));
+				final EntityIdMap<Purchase> purchases = data.purchases().computeByYear(
+					year,
+					stream -> stream.collect(toEntityIdMap(purchaseId))
+				);
 
 				this.batchInsert(this.repositories.purchaseRepository(), new BatchInserter<>(purchases, (ps, entity) ->
 				{
 					ps.setLong(2, employees.get(entity.employee()));
 					ps.setLong(3, customers.get(entity.customer()));
-					ps.setTimestamp(4, new Timestamp(entity.timestamp()));
+					ps.setTimestamp(4, new Timestamp(entity.timestamp().toInstant(ZoneOffset.UTC).toEpochMilli()));
 					ps.setLong(5, shops.get(entity.shop()));
 				}));
 
@@ -880,6 +880,7 @@ public interface DataMigrator
 					ps.setLong(2, entity.foreignId);
 					ps.setLong(3, books.get(entity.item.book()));
 					ps.setInt(4, entity.item.amount());
+					ps.setDouble(5, entity.item.price().getNumber().doubleValue());
 				}));
 
 				this.logger().info("+ " + purchases.size() + " purchases in " + year);

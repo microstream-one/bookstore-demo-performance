@@ -16,7 +16,7 @@ public class PurchaseItemRepositoryImpl extends BaseRepositoryImpl<PurchaseItemE
 	{
 		super();
 	}
-	
+
 	@Transactional
 	@Override
 	public void batchInsert(
@@ -28,21 +28,22 @@ public class PurchaseItemRepositoryImpl extends BaseRepositoryImpl<PurchaseItemE
 			ps.setLong(2, entity.getPurchase().getId());
 			ps.setLong(3, entity.getBook().getId());
 			ps.setInt(4, entity.getAmount());
+			ps.setDouble(5, entity.getPrice().getNumber().doubleValue());
 		});
 	}
-	
+
 	@Override
 	protected String insertSql()
 	{
 		return "INSERT INTO PURCHASEITEM "
-			+ "(ID,PURCHASE_ID,BOOK_ID,AMOUNT) "
-			+ "VALUES(?,?,?,?)";
+			+ "(ID,PURCHASE_ID,BOOK_ID,AMOUNT,PRICE) "
+			+ "VALUES(?,?,?,?,?)";
 	}
-	
+
 	@Override
 	protected String copySql()
 	{
 		return "COPY PURCHASEITEM "
-			+ "(ID,PURCHASE_ID,BOOK_ID,AMOUNT)";
+			+ "(ID,PURCHASE_ID,BOOK_ID,AMOUNT,PRICE)";
 	}
 }

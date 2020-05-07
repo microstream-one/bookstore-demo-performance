@@ -58,7 +58,7 @@ public interface PurchaseItemRepository extends BaseRepository<PurchaseItemEntit
 
 
 	@Query(
-		"SELECT SUM(p.amount * p.book.price) " +
+		"SELECT SUM(p.amount * p.price) " +
 		"FROM PurchaseItemEntity p " +
 		"WHERE p.purchase.shop = :shop " +
 		"  AND EXTRACT(YEAR FROM p.purchase.timestamp) = :year"

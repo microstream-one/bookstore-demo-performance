@@ -26,27 +26,28 @@ public class BookRepositoryImpl extends BaseRepositoryImpl<BookEntity>
 		this.batchInsert(entities, (ps, entity) -> {
 			ps.setLong(1, entity.getId());
 			ps.setString(2, entity.getIsbn13());
-			ps.setDouble(3, entity.getPrice());
-			ps.setString(4, entity.getTitle());
-			ps.setLong(5, entity.getAuthor().getId());
-			ps.setLong(6, entity.getGenre().getId());
-			ps.setLong(7, entity.getLanguage().getId());
-			ps.setLong(8, entity.getPublisher().getId());
+			ps.setDouble(3, entity.getPurchasePrice().getNumber().doubleValue());
+			ps.setDouble(4, entity.getRetailPrice().getNumber().doubleValue());
+			ps.setString(5, entity.getTitle());
+			ps.setLong(6, entity.getAuthor().getId());
+			ps.setLong(7, entity.getGenre().getId());
+			ps.setLong(8, entity.getLanguage().getId());
+			ps.setLong(9, entity.getPublisher().getId());
 		});
 	}
-	
+
 	@Override
 	protected String insertSql()
 	{
 		return "INSERT INTO BOOK "
-			+ "(ID,ISBN13,PRICE,TITLE,AUTHOR_ID,GENRE_ID,LANGUAGE_ID,PUBLISHER_ID) "
-			+ "VALUES(?,?,?,?,?,?,?,?)";
+			+ "(ID,ISBN13,PURCHASE_PRICE,RETAIL_PRICE,TITLE,AUTHOR_ID,GENRE_ID,LANGUAGE_ID,PUBLISHER_ID) "
+			+ "VALUES(?,?,?,?,?,?,?,?,?)";
 	}
-	
+
 	@Override
 	protected String copySql()
 	{
 		return "COPY BOOK "
-			+ "(ID,ISBN13,PRICE,TITLE,AUTHOR_ID,GENRE_ID,LANGUAGE_ID,PUBLISHER_ID)";
+			+ "(ID,ISBN13,PURCHASE_PRICE,RETAIL_PRICE,TITLE,AUTHOR_ID,GENRE_ID,LANGUAGE_ID,PUBLISHER_ID)";
 	}
 }

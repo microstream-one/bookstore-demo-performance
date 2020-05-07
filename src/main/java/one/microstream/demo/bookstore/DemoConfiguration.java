@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import one.microstream.demo.bookstore.data.RandomDataAmount;
 
-public class AppConfig
+public class DemoConfiguration
 {
 	@Value("${bookstoredemo.dataDir}")
 	private String dataDir;
@@ -17,7 +17,7 @@ public class AppConfig
 	@Value("${bookstoredemo.jpaDataMigrationStrategy:batch_insert}")
 	private String jpaDataMigrationStrategy;
 
-	public AppConfig()
+	public DemoConfiguration()
 	{
 		super();
 	}

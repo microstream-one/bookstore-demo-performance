@@ -42,7 +42,7 @@ public class Initializer implements HasLogger
 	private void migrateData()
 	{
 		DataMigrator dataMigrator             = null;
-		final String jpaDataMigrationStrategy = this.bookStoreDemo.getAppConfig().jpaDataMigrationStrategy();
+		final String jpaDataMigrationStrategy = this.bookStoreDemo.getDemoConfiguration().jpaDataMigrationStrategy();
 		switch(jpaDataMigrationStrategy)
 		{
 			case "batch_insert":
