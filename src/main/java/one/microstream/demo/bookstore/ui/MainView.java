@@ -15,7 +15,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -296,8 +298,22 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		final InitialPageSettings settings
 	)
 	{
-		settings.addLink   ("shortcut icon", "frontend/images/icon.ico"           );
-		settings.addFavIcon("icon"         , "frontend/images/icon.png", "256x256");
+		addLink(settings, "frontend/images/favicon.svg", "rel", "icon", "type", "image/svg+xml");
+		addLink(settings, "frontend/images/favicon.ico", "rel", "alternate icon");
+	}
+
+	private static void addLink(
+		final InitialPageSettings settings,
+		final String href,
+		final String... attributes
+	)
+	{
+		final Map<String, String> map = new HashMap<>();
+		for(int i = 0; i < attributes.length; )
+		{
+			map.put(attributes[i++], attributes[i++]);
+		}
+		settings.addLink(href, map);
 	}
 
 	private Component createBanner()
