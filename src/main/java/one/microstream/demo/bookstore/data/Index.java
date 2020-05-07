@@ -24,6 +24,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.util.QueryBuilder;
 
+import one.microstream.demo.bookstore.BookStoreDemo;
 import one.microstream.exceptions.IORuntimeException;
 
 /**
@@ -289,7 +290,7 @@ public interface Index<T> extends Closeable
 				if(this.directory == null)
 				{
 					final Path path = Paths.get(
-						"data",
+						BookStoreDemo.getInstance().getDemoConfiguration().dataDir(),
 						"index",
 						this.entityType.getSimpleName()
 					);
