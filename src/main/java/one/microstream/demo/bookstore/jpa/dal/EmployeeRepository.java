@@ -14,9 +14,7 @@ public interface EmployeeRepository extends NamedWithAddressRepository<EmployeeE
 		"  select p.employee_id " +
 		"  from purchaseitem i " +
 		"  cross join purchase p " +
-//		"  cross join book b " +
 		"  where i.purchase_id=p.id " +
-//		"    and i.book_id=b.id " +
 		"    and extract(YEAR FROM p.\"timestamp\")=:year " +
 		"  group by p.employee_id " +
 		"  order by SUM(i.amount*i.price) DESC" +
@@ -33,14 +31,12 @@ public interface EmployeeRepository extends NamedWithAddressRepository<EmployeeE
 		"  select p.employee_id " +
 		"  from purchaseitem i " +
 		"  cross join purchase p " +
-//		"  cross join book b " +
 		"  left outer join shop s on p.shop_id=s.id " +
 		"  left outer join address a on s.address_id=a.id " +
 		"  left outer join city c on a.city_id=c.id " +
 		"  left outer join \"state\" st on c.state_id=st.id " +
 		"  where st.country_id=:countryId " +
 		"    and i.purchase_id=p.id " +
-//		"    and i.book_id=b.id " +
 		"    and extract(YEAR FROM p.\"timestamp\")=:year " +
 		"  group by p.employee_id " +
 		"  order by SUM(i.amount*i.price) DESC" +
