@@ -28,7 +28,7 @@ Here you can see the entity relationship diagram of the generated database:
 
 After the application has started, open the client interface at: [http://localhost](http://localhost).
 
-![Screenshot](./docs/images/screenshot.png?raw=true)
+![Screenshot](./docs/images/screenshot.png)
 
 ## License
 
