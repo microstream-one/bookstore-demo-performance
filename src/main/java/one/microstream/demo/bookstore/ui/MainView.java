@@ -91,7 +91,7 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
-import one.microstream.bytes.ByteMultiple;
+import one.microstream.configuration.types.ByteUnit;
 import one.microstream.demo.bookstore.BookStoreDemo;
 import one.microstream.demo.bookstore.app.Action;
 import one.microstream.demo.bookstore.app.ActionExecutor;
@@ -224,7 +224,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 	private LineChart                    diffChart, msChart, jpaChart;
 	private final AtomicBoolean          clearMemoryStatistics = new AtomicBoolean(false);
 	private final List<MemoryStats>      memoryStats;
-	private ByteMultiple                 memoryUnit       = ByteMultiple.GB;
+	private ByteUnit                     memoryUnit       = ByteUnit.GB;
 	private final AtomicBoolean          randomQueries    = new AtomicBoolean(false);
 	private final List<QueryEntry>       queryStatistics;
 	private QueryTimeUnit                queryTimeUnit    = QueryTimeUnit.Seconds;
@@ -468,7 +468,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		final Button cmdClearMemory = new Button("Clear Statistics", event -> this.clearMemoryStatistics.set(true));
 		cmdClearMemory.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
-		final Select<ByteMultiple> cmbMemoryUnit = new Select<>(ByteMultiple.MB, ByteMultiple.GB);
+		final Select<ByteUnit> cmbMemoryUnit = new Select<>(ByteUnit.MB, ByteUnit.GB);
 		cmbMemoryUnit.setValue(this.memoryUnit);
 		cmbMemoryUnit.addValueChangeListener(event -> {
 			this.memoryUnit = cmbMemoryUnit.getValue();
@@ -939,7 +939,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 
 	private void updateMemoryChart(
 		final AreaChart chart,
-		final ByteMultiple memoryUnit,
+		final ByteUnit memoryUnit,
 		final Function<MemoryStats, MemoryUsage> memoryUsageSelector
 	)
 	{
@@ -963,9 +963,9 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		chart.setHAxis(this.axisViewWindow(Axis.Builder(), this.memoryStats.size(), 60));
 	}
 
-	private static double convertMemoryValue(final long bytes, final ByteMultiple memoryUnit)
+	private static double convertMemoryValue(final long bytes, final ByteUnit memoryUnit)
 	{
-		return ByteMultiple.convert(bytes, ByteMultiple.B).to(memoryUnit);
+		return ByteUnit.convert(bytes, ByteUnit.B).to(memoryUnit);
 	}
 
 	private void clearQueryStatistics()
@@ -1138,7 +1138,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		this.getUI().ifPresent(ui -> ui.access(command));
 	}
 
-	private static <L extends ThemableLayout> L compact(
+	static <L extends ThemableLayout> L compact(
 		final L layout
 	)
 	{
@@ -1148,21 +1148,21 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		return layout;
 	}
 
-	private static String htmlTooltip(final String text)
+	static String htmlTooltip(final String text)
 	{
 		return "<div style='color:black'>" + text + "</div>";
 	}
 
-	private static double divide(final long dividend, final long divisor)
+	static double divide(final long dividend, final long divisor)
 	{
 		return new BigDecimal(dividend)
 			.divide(new BigDecimal(divisor), 10, RoundingMode.HALF_UP)
 			.doubleValue();
 	}
 
-	private static NumberFormat decimalFormat, integerFormat;
+	static NumberFormat decimalFormat, integerFormat;
 
-	private static NumberFormat decimalFormat(final int fractionDigits)
+	static NumberFormat decimalFormat(final int fractionDigits)
 	{
 		if(decimalFormat == null)
 		{
@@ -1175,7 +1175,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		return decimalFormat;
 	}
 
-	private static NumberFormat integerFormat()
+	static NumberFormat integerFormat()
 	{
 		if(integerFormat == null)
 		{

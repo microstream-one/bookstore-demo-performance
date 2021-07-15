@@ -21,11 +21,11 @@ import org.springframework.boot.SpringApplication;
 
 import one.microstream.demo.bookstore.data.Data;
 import one.microstream.demo.bookstore.data.DataMetrics;
-import one.microstream.jdk8.java.util.BinaryHandlersJDK8;
+import one.microstream.persistence.binary.jdk8.types.BinaryHandlersJDK8;
 import one.microstream.persistence.types.Storer;
-import one.microstream.storage.configuration.Configuration;
-import one.microstream.storage.types.EmbeddedStorageFoundation;
-import one.microstream.storage.types.EmbeddedStorageManager;
+import one.microstream.storage.embedded.configuration.types.EmbeddedStorageConfiguration;
+import one.microstream.storage.embedded.types.EmbeddedStorageFoundation;
+import one.microstream.storage.embedded.types.EmbeddedStorageManager;
 
 
 /**
@@ -155,11 +155,12 @@ public final class BookStoreDemo implements HasLogger
 		{
 			this.logger().info("Initializing MicroStream StorageManager");
 
-			final Configuration configuration = Configuration.Default();
-			configuration.setBaseDirectory(Paths.get(this.demoConfiguration.dataDir(), "microstream").toString());
-			configuration.setChannelCount(Integer.highestOneBit(Runtime.getRuntime().availableProcessors() - 1));
+			final EmbeddedStorageFoundation<?> foundation = EmbeddedStorageConfiguration.Builder()
+				.setStorageDirectory(Paths.get(this.demoConfiguration.dataDir(), "microstream").toString())
+				.setChannelCount(Integer.highestOneBit(Runtime.getRuntime().availableProcessors() - 1))
+				.createEmbeddedStorageFoundation()
+			;
 
-			final EmbeddedStorageFoundation<?> foundation = configuration.createEmbeddedStorageFoundation();
 			foundation.onConnectionFoundation(BinaryHandlersJDK8::registerJDK8TypeHandlers);
 			this.storageManager = foundation.createEmbeddedStorageManager().start();
 

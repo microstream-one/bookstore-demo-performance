@@ -30,7 +30,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 
 import com.google.common.collect.Range;
 
-import one.microstream.bytes.ByteMultiple;
+import one.microstream.configuration.types.ByteUnit;
 import one.microstream.demo.bookstore.BookStoreDemo;
 import one.microstream.demo.bookstore.data.Address;
 import one.microstream.demo.bookstore.data.Author;
@@ -90,6 +90,7 @@ public interface DataMigrator
 
 		static class EntityIdMap<T> extends HashMap<T, Long>
 		{
+			// Typing Interface
 		}
 
 		static <T> Collector<T, ?, EntityIdMap<T>> toEntityIdMap()
@@ -252,7 +253,7 @@ public interface DataMigrator
 						Paths.get(this.bookStoreDemo.getDemoConfiguration().dataDir(), "bookstoredemo.sql").toFile()
 					),
 					"UTF-8"),
-				(int)ByteMultiple.MiB.toBytes(100) // buffer size
+				(int)ByteUnit.MiB.toBytes(100) // buffer size
 			));
 
 			writer.print("SET statement_timeout = 0;\n");

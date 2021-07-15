@@ -27,7 +27,7 @@ import org.rapidpm.dependencies.core.logger.HasLogger;
 import com.github.javafaker.Faker;
 
 import one.microstream.demo.bookstore.BookStoreDemo;
-import one.microstream.storage.types.EmbeddedStorageManager;
+import one.microstream.storage.embedded.types.EmbeddedStorageManager;
 
 /**
  * Random data generator for the {@link BookStoreDemo}'s {@link Data} root.
@@ -300,7 +300,7 @@ public interface RandomDataGenerator extends HasLogger
 			{
 				while(!this.usedIsbns.add(isbn = this.faker.code().isbn13(true)))
 				{
-					; // empty loop
+					// empty loop
 				}
 			}
 			final Genre          genre         = genres.get(this.random.nextInt(genres.size()));
