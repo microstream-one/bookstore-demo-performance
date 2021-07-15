@@ -11,22 +11,47 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import one.microstream.demo.bookstore.util.concurrent.ReadWriteLocked;
 
 /**
  * Inventory entity which holds {@link Book}s and amounts of them.
  * <p>
  * All operations on this type are thread safe.
  *
+ * @see ReadWriteLocked
  */
-public interface Inventory
+public class Inventory extends ReadWriteLocked
 {
+	private final Map<Book, Integer> inventoryMap;
+
+	public Inventory()
+	{
+		this(new HashMap<>());
+	}
+
+	/**
+	 * Package-private constructor used by {@link RandomDataGenerator}.
+	 */
+	Inventory(final Map<Book, Integer> inventoryMap)
+	{
+		super();
+		
+		this.inventoryMap = inventoryMap;
+	}
+	
 	/**
 	 * Get the amount of a specific book in this inventory.
 	 *
 	 * @param book the book
 	 * @return the amount of the given book in this inventory or 0
 	 */
-	public int amount(final Book book);
+	public int amount(final Book book)
+	{
+		return this.read(() -> coalesce(
+			this.inventoryMap.get(book),
+			0
+		));
+	}
 
 	/**
 	 * Executes a function with a {@link Stream} of {@link Entry}s and returns the computed value.
@@ -35,14 +60,26 @@ public interface Inventory
 	 * @param streamFunction computing function
 	 * @return the computed result
 	 */
-	public <T> T compute(Function<Stream<Entry<Book, Integer>>, T> streamFunction);
+	public <T> T compute(final Function<Stream<Entry<Book, Integer>>, T> streamFunction)
+	{
+		return this.read(() ->
+			streamFunction.apply(
+				this.inventoryMap.entrySet().stream()
+			)
+		);
+	}
 
 	/**
 	 * Get the total amount of slots (different books) in this inventory.
 	 *
 	 * @return the amount of slots
 	 */
-	public int slotCount();
+	public int slotCount()
+	{
+		return this.read(() ->
+			this.inventoryMap.size()
+		);
+	}
 
 	/**
 	 * Gets all books and their amount as a {@link List}.
@@ -50,7 +87,12 @@ public interface Inventory
 	 *
 	 * @return all books and their amount
 	 */
-	public List<Entry<Book, Integer>> slots();
+	public List<Entry<Book, Integer>> slots()
+	{
+		return this.read(() ->
+			new ArrayList<>(this.inventoryMap.entrySet())
+		);
+	}
 
 	/**
 	 * Gets all books as a {@link List}.
@@ -58,67 +100,11 @@ public interface Inventory
 	 *
 	 * @return all books
 	 */
-	public List<Book> books();
-
-
-	/**
-	 * Default implementation of the {@link Inventory} interface.
-	 *
-	 */
-	public static class Default implements Inventory
+	public List<Book> books()
 	{
-		private final Map<Book, Integer> inventoryMap;
-
-		Default()
-		{
-			this(new HashMap<>());
-		}
-
-		Default(
-			final Map<Book, Integer> inventoryMap
-		)
-		{
-			super();
-			this.inventoryMap = inventoryMap;
-		}
-
-		@Override
-		public int amount(final Book book)
-		{
-			return coalesce(
-				this.inventoryMap.get(book),
-				0
-			);
-		}
-
-		@Override
-		public <T> T compute(
-			final Function<Stream<Entry<Book, Integer>>, T> streamFunction
-		)
-		{
-			return streamFunction.apply(
-				this.inventoryMap.entrySet().stream()
-			);
-		}
-
-		@Override
-		public int slotCount()
-		{
-			return this.inventoryMap.size();
-		}
-
-		@Override
-		public List<Entry<Book, Integer>> slots()
-		{
-			return new ArrayList<>(this.inventoryMap.entrySet());
-		}
-
-		@Override
-		public List<Book> books()
-		{
-			return this.inventoryMap.keySet().stream().collect(toList());
-		}
-
+		return this.read(() ->
+			this.inventoryMap.keySet().stream().collect(toList())
+		);
 	}
 
 }

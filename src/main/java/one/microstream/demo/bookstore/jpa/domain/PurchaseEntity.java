@@ -1,7 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import javax.persistence.Table;
 	@Index(columnList = "SHOP_ID"),
 	@Index(columnList = "`TIMESTAMP`")
 })
-public class PurchaseEntity extends BaseEntity implements Serializable
+public class PurchaseEntity extends BaseEntity
 {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "EMPLOYEE_ID")

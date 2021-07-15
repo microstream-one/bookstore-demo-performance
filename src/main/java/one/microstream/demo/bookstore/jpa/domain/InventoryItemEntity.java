@@ -1,8 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "INVENTORYITEM")
-public class InventoryItemEntity extends BaseEntity implements Serializable
+public class InventoryItemEntity extends BaseEntity
 {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "BOOK_ID")

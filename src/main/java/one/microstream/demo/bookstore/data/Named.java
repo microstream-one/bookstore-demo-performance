@@ -5,50 +5,37 @@ package one.microstream.demo.bookstore.data;
  * Feature type for all named entities, with {@link Comparable} capabilities.
  *
  */
-public interface Named extends Comparable<Named>
+public abstract class Named implements Comparable<Named>
 {
+	private final String name;
+
+	protected Named(final String name)
+	{
+		super();
+		
+		this.name = name;
+	}
+
 	/**
 	 * Get the name of this entity.
 	 *
 	 * @return the name
 	 */
-	public String name();
+	public String name()
+	{
+		return this.name;
+	}
 
 	@Override
-	public default int compareTo(final Named other)
+	public int compareTo(final Named other)
 	{
 		return this.name().compareTo(other.name());
 	}
 
-
-	/**
-	 * Abstract implementation of the {@link Named} interface.
-	 *
-	 */
-	public static abstract class Abstract implements Named
+	@Override
+	public String toString()
 	{
-		private final String name;
-
-		Abstract(
-			final String name
-		)
-		{
-			super();
-			this.name = name;
-		}
-
-		@Override
-		public String name()
-		{
-			return this.name;
-		}
-
-		@Override
-		public String toString()
-		{
-			return this.getClass().getSimpleName() + " [" + this.name + "]";
-		}
-
+		return this.getClass().getSimpleName() + " [" + this.name + "]";
 	}
 
 }

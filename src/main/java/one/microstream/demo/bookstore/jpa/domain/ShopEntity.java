@@ -1,7 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "SHOP")
-public class ShopEntity extends NamedWithAddressEntity implements Serializable
+public class ShopEntity extends NamedWithAddressEntity
 {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "shop")
 	private List<EmployeeEntity> employees = new ArrayList<>();

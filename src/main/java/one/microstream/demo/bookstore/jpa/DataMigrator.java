@@ -44,7 +44,7 @@ import one.microstream.demo.bookstore.data.Genre;
 import one.microstream.demo.bookstore.data.Language;
 import one.microstream.demo.bookstore.data.Publisher;
 import one.microstream.demo.bookstore.data.Purchase;
-import one.microstream.demo.bookstore.data.Purchase.Item;
+import one.microstream.demo.bookstore.data.PurchaseItem;
 import one.microstream.demo.bookstore.data.Shop;
 import one.microstream.demo.bookstore.data.State;
 import one.microstream.demo.bookstore.jpa.dal.BaseRepository;
@@ -512,7 +512,7 @@ public interface DataMigrator
 					record[4] = shops.get(entity.shop());
 				}));
 
-				final EntityIdMap<ForeignIdItem<Item>> purchaseItems = purchases.entrySet().stream()
+				final EntityIdMap<ForeignIdItem<PurchaseItem>> purchaseItems = purchases.entrySet().stream()
 					.flatMap(purchaseEntry -> {
 						final Purchase purchase = purchaseEntry.getKey();
 						final Long     pid      = purchaseEntry.getValue();
@@ -868,7 +868,7 @@ public interface DataMigrator
 					ps.setLong(5, shops.get(entity.shop()));
 				}));
 
-				final EntityIdMap<ForeignIdItem<Item>> purchaseItems = purchases.entrySet().stream()
+				final EntityIdMap<ForeignIdItem<PurchaseItem>> purchaseItems = purchases.entrySet().stream()
 					.flatMap(purchaseEntry -> {
 						final Purchase purchase = purchaseEntry.getKey();
 						final Long     pid      = purchaseEntry.getValue();

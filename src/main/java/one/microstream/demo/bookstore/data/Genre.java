@@ -7,35 +7,18 @@ package one.microstream.demo.bookstore.data;
  * This type is immutable and therefor inherently thread safe.
  *
  */
-public interface Genre extends Named
+public class Genre extends Named
 {
 	/**
-	 * Pseudo-constructor method to create a new {@link Genre} instance with default implementation.
+	 * Constructor method to create a new {@link Genre} instance.
 	 *
-	 * @param name not empty, {@link Named.Validation#validateName(String)}
-	 * @return a new {@link Genre} instance
+	 * @param name not empty
 	 */
-	public static Genre New(
+	public Genre(
 		final String name
 	)
 	{
-		return new Default(name);
-	}
-
-
-	/**
-	 * Default implementation of the {@link Genre} interface.
-	 *
-	 */
-	public static class Default extends Named.Abstract implements Genre
-	{
-		Default(
-			final String name
-		)
-		{
-			super(name);
-		}
-
+		super(name);
 	}
 
 }

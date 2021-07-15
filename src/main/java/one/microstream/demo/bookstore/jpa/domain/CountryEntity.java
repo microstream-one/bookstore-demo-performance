@@ -1,7 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "COUNTRY")
-public class CountryEntity extends NamedWithCodeEntity implements Serializable
+public class CountryEntity extends NamedWithCodeEntity
 {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "country")
 	private List<StateEntity> states = new ArrayList<>();

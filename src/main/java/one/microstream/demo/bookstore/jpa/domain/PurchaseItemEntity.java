@@ -1,8 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
-
 import javax.money.MonetaryAmount;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -18,7 +16,7 @@ import one.microstream.demo.bookstore.jpa.MoneyConverter;
 
 @Entity
 @Table(name = "PURCHASEITEM", indexes = @Index(columnList = "PURCHASE_ID"))
-public class PurchaseItemEntity extends BaseEntity implements Serializable
+public class PurchaseItemEntity extends BaseEntity
 {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "BOOK_ID")

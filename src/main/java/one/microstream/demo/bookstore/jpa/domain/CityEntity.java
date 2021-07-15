@@ -1,8 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -12,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "CITY")
-public class CityEntity extends NamedEntity implements Serializable
+public class CityEntity extends NamedEntity
 {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "STATE_ID")

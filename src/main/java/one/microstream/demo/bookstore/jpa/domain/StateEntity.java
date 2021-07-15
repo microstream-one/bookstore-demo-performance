@@ -1,7 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "`STATE`")
-public class StateEntity extends NamedEntity implements Serializable
+public class StateEntity extends NamedEntity
 {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "COUNTRY_ID")

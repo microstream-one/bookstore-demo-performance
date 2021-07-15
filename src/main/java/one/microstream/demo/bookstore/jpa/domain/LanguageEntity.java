@@ -1,7 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "`LANGUAGE`")
-public class LanguageEntity extends BaseEntity implements Serializable
+public class LanguageEntity extends BaseEntity
 {
 	@Column(name = "LANGUAGETAG")
 	private String languageTag;

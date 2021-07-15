@@ -10,209 +10,143 @@ import javax.money.MonetaryAmount;
  * This type is immutable and therefor inherently thread safe.
  *
  */
-public interface Book extends Named
+public class Book extends Named
 {
+	private final String         isbn13       ;
+	private final Author         author       ;
+	private final Genre          genre        ;
+	private final Publisher      publisher    ;
+	private final Language       language     ;
+	private final MonetaryAmount purchasePrice;
+	private final MonetaryAmount retailPrice  ;
+	
 	/**
-	 * Gets the title of this book. This is a synonym method to get compatibility to the {@link Named} interface.
+	 * Constructor to create a new {@link Book} instance.
+	 *
+	 * @param isbn13 a valid ISBN-13
+	 * @param title not empty
+	 * @param author not <code>null</code>
+	 * @param genre not <code>null</code>
+	 * @param publisher not <code>null</code>
+	 * @param language not <code>null</code>
+	 * @param purchasePrice valid price
+	 * @param retailPrice valid price
 	 */
-	@Override
-	default String name()
+	public Book(
+		final String         isbn13       ,
+		final String         title        ,
+		final Author         author       ,
+		final Genre          genre        ,
+		final Publisher      publisher    ,
+		final Language       language     ,
+		final MonetaryAmount purchasePrice,
+		final MonetaryAmount retailPrice
+	)
 	{
-		return this.title();
+		super(title);
+		
+		this.isbn13        = isbn13;
+		this.author        = author;
+		this.genre         = genre;
+		this.publisher     = publisher;
+		this.language      = language;
+		this.purchasePrice = purchasePrice;
+		this.retailPrice   = retailPrice;
 	}
-
+	
 	/**
 	 * Get the ISBN-13.
 	 *
 	 * @return the ISBN-13
 	 */
-	public String isbn13();
+	public String isbn13()
+	{
+		return this.isbn13;
+	}
 
 	/**
 	 * Get the title.
 	 *
 	 * @return the title
 	 */
-	public String title();
+	public String title()
+	{
+		return this.name();
+	}
 
 	/**
 	 * Get the author.
 	 *
 	 * @return the author
 	 */
-	public Author author();
+	public Author author()
+	{
+		return this.author;
+	}
 
 	/**
 	 * Get the genre.
 	 *
 	 * @return the genre
 	 */
-	public Genre genre();
+	public Genre genre()
+	{
+		return this.genre;
+	}
 
 	/**
 	 * Get the publisher.
 	 *
 	 * @return the publisher
 	 */
-	public Publisher publisher();
+	public Publisher publisher()
+	{
+		return this.publisher;
+	}
 
 	/**
 	 * Get the language.
 	 *
 	 * @return the language
 	 */
-	public Language language();
+	public Language language()
+	{
+		return this.language;
+	}
 
 	/**
 	 * Get the purchase price.
 	 *
 	 * @return the purchase price
 	 */
-	public MonetaryAmount purchasePrice();
+	public MonetaryAmount purchasePrice()
+	{
+		return this.purchasePrice;
+	}
 
 	/**
 	 * Get the retail price.
 	 *
 	 * @return the retail price
 	 */
-	public MonetaryAmount retailPrice();
-
-
-	/**
-	 * Pseudo-constructor method to create a new {@link Book} instance with default implementation.
-	 *
-	 * @param isbn13 a valid ISBN-13, see {@link Validation#validateIsbn13(String)}
-	 * @param title not empty, see {@link Validation#validateTitle(String)}
-	 * @param author not <code>null</code>, see {@link Validation#validateAuthor(Author)}
-	 * @param genre not <code>null</code>, see {@link Validation#validateGenre(Genre)}
-	 * @param publisher not <code>null</code>, see {@link Validation#validatePublisher(Publisher)}
-	 * @param language not <code>null</code>, see {@link Validation#validateLanguage(Language)}
-	 * @param purchasePrice valid price, see {@link Validation#validatePrice(MonetaryAmount)}
-	 * @param retailPrice valid price, see {@link Validation#validatePrice(MonetaryAmount)}
-	 * @return
-	 */
-	public static Book New(
-		final String isbn13,
-		final String title,
-		final Author author,
-		final Genre genre,
-		final Publisher publisher,
-		final Language language,
-		final MonetaryAmount purchasePrice,
-		final MonetaryAmount retailPrice
-	)
+	public MonetaryAmount retailPrice()
 	{
-		return new Default(isbn13, title, author, genre, publisher, language, purchasePrice, retailPrice);
+		return this.retailPrice;
 	}
 
-
-	/**
-	 * Default implementation of the {@link Book} interface.
-	 *
-	 */
-	public static class Default implements Book
+	@Override
+	public String toString()
 	{
-		private final String         isbn13;
-		private final String         title;
-		private final Author         author;
-		private final Genre          genre;
-		private final Publisher      publisher;
-		private final Language       language;
-		private final MonetaryAmount purchasePrice;
-		private final MonetaryAmount retailPrice;
-
-		Default(
-			final String isbn13,
-			final String title,
-			final Author author,
-			final Genre genre,
-			final Publisher publisher,
-			final Language language,
-			final MonetaryAmount purchasePrice,
-			final MonetaryAmount retailPrice
-		)
-		{
-			super();
-			this.isbn13        = isbn13;
-			this.title         = title;
-			this.author        = author;
-			this.genre         = genre;
-			this.publisher     = publisher;
-			this.language      = language;
-			this.purchasePrice = purchasePrice;
-			this.retailPrice   = retailPrice;
-		}
-
-		@Override
-		public String isbn13()
-		{
-			return this.isbn13;
-		}
-
-		@Override
-		public String title()
-		{
-			return this.title;
-		}
-
-		@Override
-		public Author author()
-		{
-			return this.author;
-		}
-
-		@Override
-		public Genre genre()
-		{
-			return this.genre;
-		}
-
-		@Override
-		public Publisher publisher()
-		{
-			return this.publisher;
-		}
-
-		@Override
-		public Language language()
-		{
-			return this.language;
-		}
-
-		@Override
-		public MonetaryAmount purchasePrice()
-		{
-			return this.purchasePrice;
-		}
-
-		@Override
-		public MonetaryAmount retailPrice()
-		{
-			return this.retailPrice;
-		}
-
-		@Override
-		public String toString()
-		{
-			return "Book [isbn13="
-				+ this.isbn13
-				+ ", title="
-				+ this.title
-				+ ", author="
-				+ this.author
-				+ ", genre="
-				+ this.genre
-				+ ", publisher="
-				+ this.publisher
-				+ ", language="
-				+ this.language
-				+ ", purchasePrice="
-				+ this.purchasePrice
-				+ ", retailPrice="
-				+ this.retailPrice
-				+ "]";
-		}
-
+		return "Book"
+			+ " [isbn13="        + this.isbn13
+			+ ", title="         + this.name()
+			+ ", author="        + this.author
+			+ ", genre="         + this.genre
+			+ ", publisher="     + this.publisher
+			+ ", language="      + this.language
+			+ ", purchasePrice=" + this.purchasePrice
+			+ ", retailPrice="   + this.retailPrice
+			+ "]";
 	}
 
 }

@@ -56,12 +56,12 @@ public final class BookStoreDemo implements HasLogger
 	/**
 	 * {@link CurrencyUnit} for this demo, US Dollar is used as only currency.
 	 */
-	private static final CurrencyUnit         CURRENCY_UNIT          = Monetary.getCurrency(Locale.US);
+	public static final CurrencyUnit         CURRENCY_UNIT          = Monetary.getCurrency(Locale.US);
 
 	/**
 	 * Money format
 	 */
-	private final static MonetaryAmountFormat MONETARY_AMOUNT_FORMAT = MonetaryFormats.getAmountFormat(
+	public final static MonetaryAmountFormat MONETARY_AMOUNT_FORMAT = MonetaryFormats.getAmountFormat(
 		AmountFormatQueryBuilder.of(Locale.getDefault())
 			.set(CurrencyStyle.SYMBOL)
 			.build()
@@ -76,22 +76,6 @@ public final class BookStoreDemo implements HasLogger
 	private static BigDecimal scale(final BigDecimal number)
 	{
 		return number.setScale(2, RoundingMode.HALF_UP);
-	}
-
-	/**
-	 * @return the {@link CurrencyUnit} for this demo, US Dollar is used as only currency.
-	 */
-	public static CurrencyUnit currencyUnit()
-	{
-		return CURRENCY_UNIT;
-	}
-
-	/**
-	 * @return the {@link MonetaryAmountFormat} for this demo
-	 */
-	public static MonetaryAmountFormat monetaryAmountFormat()
-	{
-		return MONETARY_AMOUNT_FORMAT;
 	}
 
 	/**
@@ -111,7 +95,7 @@ public final class BookStoreDemo implements HasLogger
 	 */
 	public static MonetaryAmount money(final BigDecimal number)
 	{
-		return RoundedMoney.of(scale(number), currencyUnit());
+		return RoundedMoney.of(scale(number), CURRENCY_UNIT);
 	}
 
 	/**
@@ -168,7 +152,7 @@ public final class BookStoreDemo implements HasLogger
 			{
 				this.logger().info("No data found, initializing random data");
 
-				final Data.Default data = Data.New();
+				final Data data = new Data();
 				this.storageManager.setRoot(data);
 				this.storageManager.storeRoot();
 				final DataMetrics metrics = data.populate(

@@ -1,8 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
-
 import javax.money.MonetaryAmount;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -17,7 +15,7 @@ import one.microstream.demo.bookstore.jpa.MoneyConverter;
 
 @Entity
 @Table(name = "BOOK")
-public class BookEntity extends BaseEntity implements Serializable
+public class BookEntity extends BaseEntity
 {
 	@Column(name = "ISBN13")
 	private String isbn13;

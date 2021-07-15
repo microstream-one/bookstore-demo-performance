@@ -1,8 +1,6 @@
 
 package one.microstream.demo.bookstore.jpa.domain;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "ADDRESS")
-public class AddressEntity extends BaseEntity implements Serializable
+public class AddressEntity extends BaseEntity
 {
 	@Column(name = "ADDRESS")
 	private String address;
