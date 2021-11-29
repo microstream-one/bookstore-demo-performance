@@ -14,7 +14,9 @@ import java.util.stream.Stream;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.RegexpQuery;
 import org.apache.lucene.util.QueryBuilder;
 
 import one.microstream.demo.bookstore.BookStoreDemo;
@@ -457,9 +459,9 @@ public class Books extends ReadWriteLocked
 
 	/**
 	 * Searches all books by title with a given query.
-	 * The query can contain following wildcard characters:<br>
-	 * * placeholder for multiple characters<br>
-	 * ? placeholder for a single character
+	 *
+	 * <p>Internally, this method wraps the given query string with a leading and a trailing {@code
+	 * .*} and uses the {@link RegexpQuery} to mimic the SQL {@code LIKE} term.
 	 *
 	 * @param queryText the search query
 	 * @return a list of books matching the query, or an empty list
@@ -467,8 +469,7 @@ public class Books extends ReadWriteLocked
 	public List<Book> searchByTitle(final String queryText)
 	{
 		final Index<Book>  index        = this.ensureIndex();
-		final QueryBuilder queryBuilder = index.createQueryBuilder();
-		final Query        query        = queryBuilder.createPhraseQuery("title", queryText);
+		final RegexpQuery query = new RegexpQuery(new Term("title", ".*" + queryText + ".*"));
 		return index.search(query, Integer.MAX_VALUE);
 	}
 

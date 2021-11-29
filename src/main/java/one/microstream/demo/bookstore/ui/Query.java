@@ -198,7 +198,7 @@ class Query
 									.filter(book -> book.author().address().city().state().country() == country)
 									.collect(toList()),
 								() -> repositories.bookRepository()
-									.findByTitleLikeAndAuthorAddressCityStateCountry(pattern, countryEntity)
+									.findByTitleContainingIgnoreCaseAndAuthorAddressCityStateCountry(pattern, countryEntity)
 							))
 						)
 					)
