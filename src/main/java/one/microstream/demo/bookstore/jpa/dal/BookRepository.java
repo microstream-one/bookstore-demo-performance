@@ -20,7 +20,7 @@ public interface BookRepository extends BaseRepository<BookEntity>
 		String title
 	);
 
-	public List<BookEntity> findByTitleLikeAndAuthorAddressCityStateCountry(
+	public List<BookEntity> findByTitleContainingIgnoreCaseAndAuthorAddressCityStateCountry(
 		String title,
 		CountryEntity country
 	);
