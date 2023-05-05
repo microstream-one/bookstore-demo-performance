@@ -60,7 +60,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -76,6 +76,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.ThemableLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
@@ -84,9 +85,8 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.selection.MultiSelect;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.AppShellSettings;
 import com.vaadin.flow.server.Command;
-import com.vaadin.flow.server.InitialPageSettings;
-import com.vaadin.flow.server.PageConfigurator;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
@@ -104,9 +104,9 @@ import one.microstream.demo.bookstore.jpa.dal.Repositories;
 
 @Route
 @Push
-@Theme(value = Lumo.class, variant = Lumo.DARK)
-@HtmlImport("styles/shared-styles.html")
-public class MainView extends VerticalLayout implements PageConfigurator, ExecutionCallback
+@Theme(themeClass  = Lumo.class, variant = Lumo.DARK)
+@CssImport("styles/shared-styles.css")
+public class MainView extends VerticalLayout implements AppShellConfigurator, ExecutionCallback
 {
 	private final static class MemoryStats
 	{
@@ -295,7 +295,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 
 	@Override
 	public void configurePage(
-		final InitialPageSettings settings
+		final AppShellSettings settings
 	)
 	{
 		addLink(settings, "frontend/images/favicon.svg", "rel", "icon", "type", "image/svg+xml");
@@ -303,7 +303,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 	}
 
 	private static void addLink(
-		final InitialPageSettings settings,
+		final AppShellSettings settings,
 		final String href,
 		final String... attributes
 	)
@@ -333,11 +333,12 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 
 	private Component createQueriesControl()
 	{
-		final Select<Query> cmbQuery = new Select<>(this.queries);
+		final Select<Query> cmbQuery = new Select<>();
+		cmbQuery.setItems(this.queries);
 		cmbQuery.setValue(this.queries[0]);
 
 		final IntegerField txtIterations = new IntegerField();
-		txtIterations.setHasControls(true);
+		txtIterations.setStepButtonsVisible(true);
 		txtIterations.setAutocorrect(true);
 		txtIterations.setValue(3);
 		txtIterations.setMin(1);
@@ -405,7 +406,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 	private Component createClearActionControl(final ClearAction action)
 	{
 		final IntegerField txtInterval = new IntegerField();
-		txtInterval.setHasControls(true);
+		txtInterval.setStepButtonsVisible(true);
 		txtInterval.setAutocorrect(true);
 		txtInterval.setValue(10);
 		txtInterval.setMin(1);
@@ -468,7 +469,8 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		final Button cmdClearMemory = new Button("Clear Statistics", event -> this.clearMemoryStatistics.set(true));
 		cmdClearMemory.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
-		final Select<ByteUnit> cmbMemoryUnit = new Select<>(ByteUnit.MB, ByteUnit.GB);
+		final Select<ByteUnit> cmbMemoryUnit = new Select<>();
+		cmbMemoryUnit.setItems(ByteUnit.MB, ByteUnit.GB);
 		cmbMemoryUnit.setValue(this.memoryUnit);
 		cmbMemoryUnit.addValueChangeListener(event -> {
 			this.memoryUnit = cmbMemoryUnit.getValue();
@@ -494,7 +496,7 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		this.queryEntries = new ArrayList<>();
 		this.queryEntriesForProvider = new ArrayList<>();
 		this.queryDataProvider = DataProvider.ofCollection(this.queryEntries);
-		this.queryGrid.setDataProvider(this.queryDataProvider);
+		this.queryGrid.setItems(this.queryDataProvider);
 		this.queryGrid.setHeight("200px");
 		this.queryGrid.setWidth("100%");
 
@@ -537,7 +539,8 @@ public class MainView extends VerticalLayout implements PageConfigurator, Execut
 		final Button cmdClearQueryQueue = new Button("Cancel Scheduled Queries", event -> this.clearSubmittedQueries());
 		cmdClearQueryQueue.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
-		final Select<QueryTimeUnit> cmbQueryTimeUnit = new Select<>(QueryTimeUnit.values());
+		final Select<QueryTimeUnit> cmbQueryTimeUnit = new Select<>();
+		cmbQueryTimeUnit.setItems(QueryTimeUnit.values());
 		cmbQueryTimeUnit.setValue(this.queryTimeUnit);
 		cmbQueryTimeUnit.addValueChangeListener(event -> {
 			this.queryTimeUnit = cmbQueryTimeUnit.getValue();
